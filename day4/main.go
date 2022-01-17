@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strings"
 )
@@ -39,24 +38,39 @@ func parseInput() ([]string, [][]bingoNumber) {
 
 		var boardSplit []string = strings.Split(boardString, " ")
 
-		fmt.Println(len(boardSplit))
+		var currentChunk []bingoNumber
+		for x := range boardSplit {
+			var bingoNum bingoNumber = bingoNumber{number: boardSplit[x], seen: false}
+			currentChunk = append(currentChunk, bingoNum)
 
-		// for j := range boardSplit {
-		// 	fmt.Println(boardSplit[j])
-		// }
-
-		// var actualBoard []bingoNumber
-
-		// boards = append(boards, board)
+			if len(currentChunk) == 5 {
+				boards = append(boards, currentChunk)
+				currentChunk = nil
+			}
+		}
 	}
 
 	return numbers, boards
 }
 
+func checkWinner(boards [][]bingoNumber, number string) {
+
+}
+
 func part1() {
-	// numbers, boards = parseInput()
-	// fmt.Println("numbers", numbers)
-	// fmt.Println("boards", boards)
+	numbers, boards := parseInput()
+
+	for i := range numbers {
+		for x := range boards {
+			for y := range boards[x] {
+				if numbers[i] == boards[x][y].number {
+					boards[x][y].seen = true
+
+					checkWinner(boards, numbers[i])
+				}
+			}
+		}
+	}
 }
 
 // func part2() {
@@ -64,7 +78,6 @@ func part1() {
 // }
 
 func main() {
-	parseInput()
-	// part1()
+	part1()
 	// part2()
 }
