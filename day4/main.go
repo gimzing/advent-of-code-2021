@@ -19,7 +19,7 @@ type bingoNumber struct {
 }
 
 func parseInput() ([]string, [][][]bingoNumber) {
-	data, err := os.ReadFile("input.txt")
+	data, err := os.ReadFile("test.txt")
 	checkError(err)
 
 	inputStrings := strings.Split(string(data), "\n\n")
@@ -39,9 +39,7 @@ func parseInput() ([]string, [][][]bingoNumber) {
 			boardString = strings.Replace(boardString, " ", "", 1)
 		}
 
-		// This is where it goes wrong
 		var boardSplit []string = strings.Split(boardString, "\n")
-
 		var actualBoard [][]bingoNumber
 
 		for j := range boardSplit {
@@ -61,16 +59,10 @@ func parseInput() ([]string, [][][]bingoNumber) {
 		boards = append(boards, actualBoard)
 	}
 
-	fmt.Println(boards)
-
 	return numbers, boards
 }
 
 func getWinner(board [][]bingoNumber, number string) {
-	fmt.Println("board", board)
-	fmt.Println("len", len(board))
-	fmt.Println("number", number)
-
 	var totalUnseen int = 0
 	for i := range board {
 		for j := range board[i] {
@@ -88,6 +80,7 @@ func getWinner(board [][]bingoNumber, number string) {
 	checkError(err)
 
 	fmt.Println("totalUnseen", totalUnseen)
+	fmt.Println("number", number)
 	fmt.Println("answer", value*totalUnseen)
 
 	os.Exit(1)
@@ -106,6 +99,23 @@ func checkWinner(board [][]bingoNumber, number string) {
 			getWinner(board, number)
 		}
 	}
+}
+
+func checkWinnerPart2(board [][]bingoNumber, number string) bool {
+	column := checkColumn(board)
+	if column == true {
+		return true
+	}
+
+	row := false
+	for i := range board {
+		row = checkRow(board[i])
+		if row == true {
+			return true
+		}
+	}
+
+	return false
 }
 
 func checkRow(row []bingoNumber) bool {
@@ -155,11 +165,38 @@ func part1() {
 	}
 }
 
-// func part2() {
+func part2() {
+	numbers, boards := parseInput()
 
-// }
+	for i := range numbers {
+		var totalWinningBoards int = 0
+		for x := range boards {
+			var boardHasWon bool = false
+			for y := range boards[x] {
+				for z := range boards[x][y] {
+					if numbers[i] == boards[x][y][z].number {
+						boards[x][y][z].seen = true
+					}
+
+					if checkWinnerPart2(boards[x], numbers[i]) == true {
+						boardHasWon = true
+					}
+				}
+			}
+
+			fmt.Println(boardHasWon)
+
+			if boardHasWon == true {
+				totalWinningBoards++
+				if totalWinningBoards == len(boards) {
+					getWinner(boards[x], numbers[i])
+				}
+			}
+		}
+	}
+}
 
 func main() {
-	part1()
-	// part2()
+	// part1()
+	part2()
 }
