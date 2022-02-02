@@ -18,7 +18,12 @@ type bingoNumber struct {
 	seen   bool
 }
 
-func parseInput() ([]string, [][][]bingoNumber) {
+type boardWithHasWon struct {
+	board  [][]bingoNumber
+	hasWon bool
+}
+
+func parseInput() ([]string, []boardWithHasWon) {
 	data, err := os.ReadFile("test.txt")
 	checkError(err)
 
@@ -26,7 +31,7 @@ func parseInput() ([]string, [][][]bingoNumber) {
 	var numbers []string = strings.Split(inputStrings[0], ",")
 	var boardsString []string = inputStrings[1:]
 
-	var boards [][][]bingoNumber
+	var boards []boardWithHasWon
 
 	for i := range boardsString {
 		var boardString string = boardsString[i]
@@ -40,7 +45,9 @@ func parseInput() ([]string, [][][]bingoNumber) {
 		}
 
 		var boardSplit []string = strings.Split(boardString, "\n")
-		var actualBoard [][]bingoNumber
+		var actualBoard boardWithHasWon
+
+		var actualBoardBoard [][]bingoNumber
 
 		for j := range boardSplit {
 			var currentChunk []bingoNumber
@@ -51,10 +58,12 @@ func parseInput() ([]string, [][][]bingoNumber) {
 			}
 
 			if len(currentChunk) == 5 {
-				actualBoard = append(actualBoard, currentChunk)
+				actualBoardBoard = append(actualBoardBoard, currentChunk)
 				currentChunk = nil
 			}
 		}
+
+		actualBoard = boardWithHasWon{board: actualBoardBoard, hasWon: false}
 
 		boards = append(boards, actualBoard)
 	}
@@ -62,13 +71,13 @@ func parseInput() ([]string, [][][]bingoNumber) {
 	return numbers, boards
 }
 
-func getWinner(board [][]bingoNumber, number string) {
+func getWinner(board boardWithHasWon, currentNumber string) {
 	var totalUnseen int = 0
-	for i := range board {
-		for j := range board[i] {
+	for i := range board.board {
+		for j := range board.board[i] {
 
-			if board[i][j].seen == false {
-				value, err := strconv.Atoi(board[i][j].number)
+			if !board.board[i][j].seen {
+				value, err := strconv.Atoi(board.board[i][j].number)
 				checkError(err)
 
 				totalUnseen += value
@@ -76,41 +85,26 @@ func getWinner(board [][]bingoNumber, number string) {
 		}
 	}
 
-	value, err := strconv.Atoi(number)
+	value, err := strconv.Atoi(currentNumber)
 	checkError(err)
 
 	fmt.Println("totalUnseen", totalUnseen)
-	fmt.Println("number", number)
+	fmt.Println("currentNumber", currentNumber)
 	fmt.Println("answer", value*totalUnseen)
+	fmt.Println()
 
 	os.Exit(1)
 }
 
-func checkWinner(board [][]bingoNumber, number string) {
+func checkWinner(board boardWithHasWon, number string) bool {
 	column := checkColumn(board)
-	if column == true {
-		getWinner(board, number)
-	}
-
-	row := false
-	for i := range board {
-		row = checkRow(board[i])
-		if row == true {
-			getWinner(board, number)
-		}
-	}
-}
-
-func checkWinnerPart2(board [][]bingoNumber, number string) bool {
-	column := checkColumn(board)
-	if column == true {
+	if column {
 		return true
 	}
 
-	row := false
-	for i := range board {
-		row = checkRow(board[i])
-		if row == true {
+	for i := range board.board {
+		row := checkRow(board.board[i])
+		if row {
 			return true
 		}
 	}
@@ -122,7 +116,7 @@ func checkRow(row []bingoNumber) bool {
 	var rowSeen bool = true
 
 	for i := range row {
-		if row[i].seen == false {
+		if !row[i].seen {
 			rowSeen = false
 		}
 	}
@@ -130,17 +124,17 @@ func checkRow(row []bingoNumber) bool {
 	return rowSeen
 }
 
-func checkColumn(board [][]bingoNumber) bool {
+func checkColumn(board boardWithHasWon) bool {
 	var columnSeen bool = true
 
 	for i := 0; i < 5; i++ {
-		for j := range board {
-			if board[j][i].seen == false {
+		for j := range board.board {
+			if !board.board[j][i].seen {
 				columnSeen = false
 			}
 		}
 
-		if columnSeen == true {
+		if columnSeen {
 			return true
 		}
 	}
@@ -153,12 +147,14 @@ func part1() {
 
 	for i := range numbers {
 		for x := range boards {
-			for y := range boards[x] {
-				for z := range boards[x][y] {
-					if numbers[i] == boards[x][y][z].number {
-						boards[x][y][z].seen = true
+			for y := range boards[x].board {
+				for z := range boards[x].board[y] {
+					if numbers[i] == boards[x].board[y][z].number {
+						boards[x].board[y][z].seen = true
 					}
-					checkWinner(boards[x], numbers[i])
+					if checkWinner(boards[x], numbers[i]) {
+						getWinner(boards[x], numbers[i])
+					}
 				}
 			}
 		}
@@ -169,29 +165,32 @@ func part2() {
 	numbers, boards := parseInput()
 
 	for i := range numbers {
+		var lastBoardToWin boardWithHasWon
+		for x := range boards {
+			for y := range boards[x].board {
+				for z := range boards[x].board[y] {
+					if boards[x].board[y][z].number == numbers[i] {
+						boards[x].board[y][z].seen = true
+
+						if checkWinner(boards[x], numbers[i]) {
+							boards[x].hasWon = true
+							lastBoardToWin = boards[x]
+						}
+					}
+
+				}
+			}
+		}
+
 		var totalWinningBoards int = 0
 		for x := range boards {
-			var boardHasWon bool = false
-			for y := range boards[x] {
-				for z := range boards[x][y] {
-					if numbers[i] == boards[x][y][z].number {
-						boards[x][y][z].seen = true
-					}
-
-					if checkWinnerPart2(boards[x], numbers[i]) == true {
-						boardHasWon = true
-					}
-				}
-			}
-
-			fmt.Println(boardHasWon)
-
-			if boardHasWon == true {
+			if boards[x].hasWon {
 				totalWinningBoards++
-				if totalWinningBoards == len(boards) {
-					getWinner(boards[x], numbers[i])
-				}
 			}
+		}
+
+		if totalWinningBoards == len(boards) {
+			getWinner(lastBoardToWin, numbers[i])
 		}
 	}
 }
