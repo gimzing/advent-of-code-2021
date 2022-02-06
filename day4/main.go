@@ -24,7 +24,7 @@ type boardWithHasWon struct {
 }
 
 func parseInput() ([]string, []boardWithHasWon) {
-	data, err := os.ReadFile("test.txt")
+	data, err := os.ReadFile("input.txt")
 	checkError(err)
 
 	inputStrings := strings.Split(string(data), "\n\n")
@@ -72,6 +72,7 @@ func parseInput() ([]string, []boardWithHasWon) {
 }
 
 func getWinner(board boardWithHasWon, currentNumber string) {
+
 	var totalUnseen int = 0
 	for i := range board.board {
 		for j := range board.board[i] {
@@ -96,7 +97,7 @@ func getWinner(board boardWithHasWon, currentNumber string) {
 	os.Exit(1)
 }
 
-func checkWinner(board boardWithHasWon, number string) bool {
+func checkWinner(board boardWithHasWon) bool {
 	column := checkColumn(board)
 	if column {
 		return true
@@ -113,21 +114,18 @@ func checkWinner(board boardWithHasWon, number string) bool {
 }
 
 func checkRow(row []bingoNumber) bool {
-	var rowSeen bool = true
-
 	for i := range row {
 		if !row[i].seen {
-			rowSeen = false
+			return false
 		}
 	}
 
-	return rowSeen
+	return true
 }
 
 func checkColumn(board boardWithHasWon) bool {
-	var columnSeen bool = true
-
 	for i := 0; i < 5; i++ {
+		var columnSeen bool = true
 		for j := range board.board {
 			if !board.board[j][i].seen {
 				columnSeen = false
@@ -143,6 +141,7 @@ func checkColumn(board boardWithHasWon) bool {
 }
 
 func part1() {
+	fmt.Println("PART 1")
 	numbers, boards := parseInput()
 
 	for i := range numbers {
@@ -152,7 +151,7 @@ func part1() {
 					if numbers[i] == boards[x].board[y][z].number {
 						boards[x].board[y][z].seen = true
 					}
-					if checkWinner(boards[x], numbers[i]) {
+					if checkWinner(boards[x]) {
 						getWinner(boards[x], numbers[i])
 					}
 				}
@@ -162,35 +161,39 @@ func part1() {
 }
 
 func part2() {
+	fmt.Println("PART 2")
 	numbers, boards := parseInput()
 
 	for i := range numbers {
-		var lastBoardToWin boardWithHasWon
-		for x := range boards {
-			for y := range boards[x].board {
-				for z := range boards[x].board[y] {
-					if boards[x].board[y][z].number == numbers[i] {
-						boards[x].board[y][z].seen = true
 
-						if checkWinner(boards[x], numbers[i]) {
-							boards[x].hasWon = true
-							lastBoardToWin = boards[x]
+		var lastBoardToWin boardWithHasWon
+
+		for x := range boards {
+			if !boards[x].hasWon {
+				for y := range boards[x].board {
+					for z := range boards[x].board[y] {
+						if boards[x].board[y][z].number == numbers[i] {
+							boards[x].board[y][z].seen = true
+
+							if checkWinner(boards[x]) {
+								boards[x].hasWon = true
+								lastBoardToWin = boards[x]
+
+								var totalWinningBoards int = 0
+								for w := range boards {
+									if boards[w].hasWon {
+										totalWinningBoards++
+									}
+
+									if totalWinningBoards == len(boards) {
+										getWinner(lastBoardToWin, numbers[i])
+									}
+								}
+							}
 						}
 					}
-
 				}
 			}
-		}
-
-		var totalWinningBoards int = 0
-		for x := range boards {
-			if boards[x].hasWon {
-				totalWinningBoards++
-			}
-		}
-
-		if totalWinningBoards == len(boards) {
-			getWinner(lastBoardToWin, numbers[i])
 		}
 	}
 }
