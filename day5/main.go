@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -12,15 +13,14 @@ func checkError(err error) {
 	}
 }
 
-type line struct {
-	x1 int
-	y1 int
-	x2 int
-	y2 int
+type coordinate struct {
+	x int
+	y int
 }
 
-type oceanFloor struct {
-	floor [10][10]int
+type line struct {
+	coordinate1 coordinate
+	coordinate2 coordinate
 }
 
 func parseInput() []line {
@@ -43,15 +43,55 @@ func parseInput() []line {
 		y2, err := strconv.Atoi(lineString[3])
 		checkError(err)
 
-		line := line{x1: x1, y1: y1, x2: x2, y2: y2}
+		line := line{coordinate1: coordinate{x: x1, y: y1}, coordinate2: coordinate{x: x2, y: y2}}
+		// line := line{x1: x1, y1: y1, x2: x2, y2: y2}
 		lines = append(lines, line)
 	}
 
 	return lines
 }
 
+func findLineCoordinates(line line, axis string) []coordinate {
+	var coordinates []coordinate
+
+	if axis == "x" {
+
+		if line.coordinate1.y > line.coordinate2.y {
+
+			for i := line.coordinate2.y; i < line.coordinate1.y; i++ {
+				fmt.Println("i", i)
+			}
+
+		} else if line.coordinate1.y < line.coordinate2.y {
+
+			for i := line.coordinate1.y; i < line.coordinate2.y; i++ {
+				fmt.Println("i", i)
+			}
+		}
+
+	}
+	// else if axis == "y" {
+
+	// }
+
+	return coordinates
+}
+
 func main() {
-	parseInput()
-	// part1()
-	// part2()
+	lines := parseInput()
+	var oceanFloor [10][10]int
+	fmt.Println(oceanFloor)
+	// floor := oceanFloor{}
+	// fmt.Println(lines)
+	// fmt.Println(floor)
+
+	for _, line := range lines {
+		if line.coordinate1.x == line.coordinate2.x {
+			findLineCoordinates(line, "x")
+		}
+
+		if line.coordinate1.y == line.coordinate2.y {
+			findLineCoordinates(line, "y")
+		}
+	}
 }
