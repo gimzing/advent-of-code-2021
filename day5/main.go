@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -24,7 +25,7 @@ type line struct {
 }
 
 func parseInput() []line {
-	data, err := os.ReadFile("test.txt")
+	data, err := os.ReadFile("input.txt")
 	checkError(err)
 
 	var lines []line
@@ -84,37 +85,35 @@ func findStraightLineCoordinates(line line, axis string) []coordinate {
 	return coordinates
 }
 
-func findDiagonalLineCoordinates(coordinates []coordinate, line line, axis string) []coordinate {
-	var diagonalCoordinates []coordinate
+func findDiagonalLineCoordinates(line line) []coordinate {
+	var coordinates []coordinate
 
-	if axis == "x" {
-		if line.coordinate1.y > line.coordinate2.y {
-			for i := line.coordinate2.y; i < line.coordinate1.y+1; i++ {
-				newCoordinate := coordinate{x: line.coordinate1.x, y: i}
-				diagonalCoordinates = append(diagonalCoordinates, newCoordinate)
-			}
-		} else if line.coordinate1.y < line.coordinate2.y {
-			for i := line.coordinate1.y; i < line.coordinate2.y+1; i++ {
-				newCoordinate := coordinate{x: line.coordinate1.x, y: i}
-				diagonalCoordinates = append(diagonalCoordinates, newCoordinate)
-			}
+	steps := int(math.Abs(float64(line.coordinate1.x)-float64(line.coordinate2.x))) + 1
+
+	if line.coordinate1.x >= line.coordinate2.x && line.coordinate1.y >= line.coordinate2.y {
+		for i := 0; i < steps; i++ {
+			newCoordinate := coordinate{x: line.coordinate1.x - i, y: line.coordinate1.y - i}
+			coordinates = append(coordinates, newCoordinate)
 		}
-	} else if axis == "y" {
-		if line.coordinate1.x > line.coordinate2.x {
-			for i := line.coordinate2.x; i < line.coordinate1.x+1; i++ {
-				newCoordinate := coordinate{x: i, y: line.coordinate1.y}
-				diagonalCoordinates = append(diagonalCoordinates, newCoordinate)
-			}
-		} else if line.coordinate1.x < line.coordinate2.x {
-			for i := line.coordinate1.x; i < line.coordinate2.x+1; i++ {
-				newCoordinate := coordinate{x: i, y: line.coordinate1.y}
-				diagonalCoordinates = append(diagonalCoordinates, newCoordinate)
-			}
+	} else if line.coordinate1.x < line.coordinate2.x && line.coordinate1.y < line.coordinate2.y {
+		for i := 0; i < steps; i++ {
+			newCoordinate := coordinate{x: line.coordinate1.x + i, y: line.coordinate1.y + i}
+			coordinates = append(coordinates, newCoordinate)
+		}
+	} else if line.coordinate1.x >= line.coordinate2.x && line.coordinate1.y < line.coordinate2.y {
+		for i := 0; i < steps; i++ {
+			newCoordinate := coordinate{x: line.coordinate1.x - i, y: line.coordinate1.y + i}
+			coordinates = append(coordinates, newCoordinate)
+		}
+	} else {
+		for i := 0; i < steps; i++ {
+			newCoordinate := coordinate{x: line.coordinate1.x + i, y: line.coordinate1.y - i}
+			coordinates = append(coordinates, newCoordinate)
 		}
 	}
 
 	// fmt.Println("\n", line)
-	// fmt.Println(diagonalCoordinates)
+	// fmt.Println(coordinates)
 	return coordinates
 }
 
@@ -180,6 +179,15 @@ func part2() {
 				oceanFloor[coordinates[i].x][coordinates[i].y]++
 			}
 		}
+
+		if math.Abs(float64(line.coordinate1.x)-float64(line.coordinate2.x)) == math.Abs(float64(line.coordinate1.y)-float64(line.coordinate2.y)) {
+			coordinates := findDiagonalLineCoordinates(line)
+
+			for i := range coordinates {
+				oceanFloor[coordinates[i].x][coordinates[i].y]++
+			}
+		}
+
 	}
 
 	var count int = 0
