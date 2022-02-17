@@ -31,6 +31,7 @@ func parseInput(filename string) []int {
 }
 
 func part1(input []int) {
+	fmt.Println("Part 1")
 
 	var lowestFuel int
 
@@ -55,6 +56,7 @@ func part1(input []int) {
 }
 
 func part2(input []int) {
+	fmt.Println("Part 2")
 
 	var lowestFuel int
 
