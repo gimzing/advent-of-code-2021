@@ -14,8 +14,8 @@ func checkError(err error) {
 	}
 }
 
-func parseInput() []string {
-	data, err := os.ReadFile("input.txt")
+func parseInput(filename string) []string {
+	data, err := os.ReadFile(filename)
 	checkError(err)
 
 	inputStrings := strings.Split(string(data), "\n")
@@ -51,8 +51,10 @@ func findOneAndZeroCounts(array []string, index int) (int, int) {
 	return oneCount, zeroCount
 }
 
-func part1() {
-	var binaries []string = parseInput()
+func part1(input []string) {
+	fmt.Println("Part 1")
+
+	binaries := input
 	length := len(binaries[0])
 	var gamma_bits string = ""
 	var epsilon_bits string = ""
@@ -82,10 +84,13 @@ func part1() {
 	var epsilon_rate float64 = binaryToDecimal(epsilon_bits)
 
 	fmt.Println(gamma_rate * epsilon_rate)
+	fmt.Println()
 }
 
-func part2() {
-	var binaries []string = parseInput()
+func part2(input []string) {
+	fmt.Println("Part 2")
+
+	binaries := input
 	length := len(binaries[0])
 	var currentArray []string = binaries
 	i := 0
@@ -149,11 +154,11 @@ func part2() {
 
 	var c02 float64 = binaryToDecimal(currentArray[0])
 
-	fmt.Println()
 	fmt.Println(oxygen * c02)
 }
 
 func main() {
-	part1()
-	part2()
+	input := parseInput("input.txt")
+	part1(input)
+	part2(input)
 }

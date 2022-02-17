@@ -13,8 +13,8 @@ func checkError(err error) {
 	}
 }
 
-func parseInput() []int {
-	data, err := os.ReadFile("input.txt")
+func parseInput(filename string) []int {
+	data, err := os.ReadFile(filename)
 	checkError(err)
 
 	var numbers []int
@@ -29,12 +29,11 @@ func parseInput() []int {
 	return numbers
 }
 
-func part1(days int) {
+func part1(input []int, days int) {
 	fmt.Println("Part 1")
-	timers := parseInput()
+	timers := input
 
 	day := 0
-
 	for day < days {
 		var newTimers []int
 
@@ -55,9 +54,10 @@ func part1(days int) {
 	fmt.Println()
 }
 
-func part2(days int) {
+func part2(input []int, days int) {
 	fmt.Println("Part 2")
-	timers := parseInput()
+
+	timers := input
 
 	m := make(map[int]int)
 
@@ -102,6 +102,8 @@ func part2(days int) {
 }
 
 func main() {
-	part1(80)
-	part2(256)
+	input := parseInput("input.txt")
+
+	part1(input, 80)
+	part2(input, 256)
 }

@@ -23,8 +23,8 @@ type boardWithHasWon struct {
 	hasWon bool
 }
 
-func parseInput() ([]string, []boardWithHasWon) {
-	data, err := os.ReadFile("input.txt")
+func parseInput(filename string) ([]string, []boardWithHasWon) {
+	data, err := os.ReadFile(filename)
 	checkError(err)
 
 	inputStrings := strings.Split(string(data), "\n\n")
@@ -140,9 +140,8 @@ func checkColumn(board boardWithHasWon) bool {
 	return false
 }
 
-func part1() {
-	fmt.Println("PART 1")
-	numbers, boards := parseInput()
+func part1(numbers []string, boards []boardWithHasWon) {
+	fmt.Println("Part 1")
 
 	for i := range numbers {
 		for x := range boards {
@@ -160,12 +159,10 @@ func part1() {
 	}
 }
 
-func part2() {
-	fmt.Println("PART 2")
-	numbers, boards := parseInput()
+func part2(numbers []string, boards []boardWithHasWon) {
+	fmt.Println("Part 2")
 
 	for i := range numbers {
-
 		var lastBoardToWin boardWithHasWon
 
 		for x := range boards {
@@ -199,6 +196,8 @@ func part2() {
 }
 
 func main() {
-	// part1()
-	part2()
+	numbers, boards := parseInput("input.txt")
+
+	// part1(numbers, boards)
+	part2(numbers, boards)
 }

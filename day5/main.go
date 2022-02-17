@@ -24,8 +24,8 @@ type line struct {
 	coordinate2 coordinate
 }
 
-func parseInput() []line {
-	data, err := os.ReadFile("input.txt")
+func parseInput(filename string) []line {
+	data, err := os.ReadFile(filename)
 	checkError(err)
 
 	var lines []line
@@ -117,9 +117,10 @@ func findDiagonalLineCoordinates(line line) []coordinate {
 	return coordinates
 }
 
-func part1() {
+func part1(input []line) {
 	fmt.Println("PART 1")
-	lines := parseInput()
+
+	lines := input
 	// var oceanFloor [10][10]int
 	var oceanFloor [1000][1000]int
 	// fmt.Println(oceanFloor)
@@ -156,9 +157,10 @@ func part1() {
 	fmt.Println()
 }
 
-func part2() {
+func part2(input []line) {
 	fmt.Println("PART 2")
-	lines := parseInput()
+
+	lines := input
 	// var oceanFloor [10][10]int
 	var oceanFloor [1000][1000]int
 	// fmt.Println(oceanFloor)
@@ -205,6 +207,8 @@ func part2() {
 }
 
 func main() {
-	part1()
-	part2()
+	input := parseInput("input.txt")
+
+	part1(input)
+	part2(input)
 }

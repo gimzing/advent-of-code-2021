@@ -18,17 +18,18 @@ func checkError(err error) {
 	}
 }
 
-func parseInput() []string {
-	data, err := os.ReadFile("input.txt")
+func parseInput(filename string) []string {
+	data, err := os.ReadFile(filename)
 	checkError(err)
 
 	inputStrings := strings.Split(string(data), "\n")
 	return inputStrings
 }
 
-func part1() {
-	var depths []string = parseInput()
+func part1(input []string) {
+	fmt.Println("Part 1")
 
+	depths := input
 	var forward int
 	var depth int
 
@@ -49,11 +50,13 @@ func part1() {
 	}
 
 	fmt.Println(depth, forward, depth*forward)
+	fmt.Println()
 }
 
-func part2() {
-	var depths []string = parseInput()
+func part2(input []string) {
+	fmt.Println("Part 2")
 
+	depths := input
 	var forward int
 	var depth int
 	var aim int
@@ -78,6 +81,7 @@ func part2() {
 }
 
 func main() {
-	part1()
-	part2()
+	input := parseInput("input.txt")
+	part1(input)
+	part2(input)
 }
