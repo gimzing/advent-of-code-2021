@@ -261,14 +261,6 @@ func getAdjacentBasinPoints(floor [][]cavePoint, cavePoint cavePoint) ([][]caveP
 	return floor, newPoint
 }
 
-// func appendAdjacentPoint(floor [][]cavePoint, currentPoint cavePoint, adjacentPoint cavePoint) [][]cavePoint {
-// 	i := currentPoint.y
-// 	j := currentPoint.x
-
-// 	floor[i][j].adjacentBasinPoints = append(floor[i][j].adjacentBasinPoints, adjacentPoint)
-// 	return floor
-// }
-
 func findAdjacentBasinPoints(floor [][]cavePoint, point cavePoint) []cavePoint {
 	var points []cavePoint
 	i := point.y
@@ -397,7 +389,6 @@ func part1(floor [][]cavePoint) {
 		total += x.height + 1
 	}
 
-	// printFloor(floor)
 	fmt.Println(total)
 	fmt.Println()
 }
@@ -406,7 +397,6 @@ func part2(floor [][]cavePoint) {
 	fmt.Println("Part 2")
 
 	lowestPoints := getLowestCavePoints(floor)
-	fmt.Println(len(lowestPoints))
 
 	hadNewBasinPoint := true
 	for hadNewBasinPoint {
@@ -425,10 +415,6 @@ func part2(floor [][]cavePoint) {
 
 		hadNewBasinPoint = atLeastOneNewPoint
 	}
-	fmt.Println()
-	// printFloor(floor)
-
-	// lowestPoints := getLowestCavePoints(floor)
 
 	var basinSizes []int
 	for i := range lowestPoints {
@@ -462,22 +448,11 @@ func part2(floor [][]cavePoint) {
 			}
 		}
 
-		if len(basinPoints) == 108 {
-			fmt.Println(basinPoints)
-		}
-
 		basinSizes = append(basinSizes, len(basinPoints))
 	}
 
-	printFloor(floor)
-
-	fmt.Println(len(basinSizes))
-	fmt.Println()
 	sort.Ints(basinSizes)
-	fmt.Println(basinSizes)
 	threeLargestBasins := basinSizes[len(basinSizes)-3:]
-	fmt.Println(threeLargestBasins)
-
 	fmt.Println(uint64(threeLargestBasins[0]) * uint64(threeLargestBasins[1]) * uint64(threeLargestBasins[2]))
 	fmt.Println()
 }
@@ -485,6 +460,6 @@ func part2(floor [][]cavePoint) {
 func main() {
 	input := parseInput("input.txt")
 
-	// part1(input)
+	part1(input)
 	part2(input)
 }
