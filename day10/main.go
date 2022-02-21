@@ -7,6 +7,27 @@ import (
 	"strings"
 )
 
+var CHAR_MAP = map[string]string{
+	"(": ")",
+	"[": "]",
+	"{": "}",
+	"<": ">",
+}
+
+var ERROR_SCORES = map[string]int{
+	")": 3,
+	"]": 57,
+	"}": 1197,
+	">": 25137,
+}
+
+var COMPLETION_SCORES = map[string]int{
+	"(": 1,
+	"[": 2,
+	"{": 3,
+	"<": 4,
+}
+
 func checkError(err error) {
 	if err != nil {
 		panic(err)
@@ -21,10 +42,10 @@ func parseInput(filename string) []string {
 	return lines
 }
 
-func checkMatchingCharacter(buffer *[]string, errors *[]string, charmap map[string]string, character string) bool {
+func checkMatchingCharacter(buffer *[]string, errors *[]string, character string) bool {
 	hadError := false
 	if (*buffer)[len((*buffer))-1] != character {
-		*errors = append((*errors), charmap[character])
+		*errors = append((*errors), CHAR_MAP[character])
 		hadError = true
 	} else {
 		*buffer = (*buffer)[:len((*buffer))-1]
@@ -32,7 +53,7 @@ func checkMatchingCharacter(buffer *[]string, errors *[]string, charmap map[stri
 	return hadError
 }
 
-func part1(lines []string, charmap map[string]string) []string {
+func part1(lines []string) []string {
 	fmt.Println("Part 1")
 
 	var incompleteLines []string
@@ -53,13 +74,13 @@ func part1(lines []string, charmap map[string]string) []string {
 				currentBuffer = append(currentBuffer, i)
 
 			case ")":
-				hadError = checkMatchingCharacter(&currentBuffer, &errors, charmap, "(")
+				hadError = checkMatchingCharacter(&currentBuffer, &errors, "(")
 			case "]":
-				hadError = checkMatchingCharacter(&currentBuffer, &errors, charmap, "[")
+				hadError = checkMatchingCharacter(&currentBuffer, &errors, "[")
 			case "}":
-				hadError = checkMatchingCharacter(&currentBuffer, &errors, charmap, "{")
+				hadError = checkMatchingCharacter(&currentBuffer, &errors, "{")
 			case ">":
-				hadError = checkMatchingCharacter(&currentBuffer, &errors, charmap, "<")
+				hadError = checkMatchingCharacter(&currentBuffer, &errors, "<")
 			}
 
 			if hadError {
@@ -74,15 +95,7 @@ func part1(lines []string, charmap map[string]string) []string {
 
 	points := 0
 	for _, character := range errors {
-		if character == ")" {
-			points += 3
-		} else if character == "]" {
-			points += 57
-		} else if character == "}" {
-			points += 1197
-		} else if character == ">" {
-			points += 25137
-		}
+		points += ERROR_SCORES[character]
 	}
 
 	fmt.Println(points)
@@ -91,10 +104,8 @@ func part1(lines []string, charmap map[string]string) []string {
 	return incompleteLines
 }
 
-func part2(lines []string, charmap map[string]string) {
+func part2(lines []string) {
 	fmt.Println("Part 2")
-
-	// fmt.Println(lines)
 
 	var points []int
 	for _, line := range lines {
@@ -124,16 +135,8 @@ func part2(lines []string, charmap map[string]string) {
 
 		currentPoints := 0
 		for i := len(currentBuffer) - 1; i >= 0; i-- {
-			currentPoints = currentPoints * 5
-			if currentBuffer[i] == "(" {
-				currentPoints += 1
-			} else if currentBuffer[i] == "[" {
-				currentPoints += 2
-			} else if currentBuffer[i] == "{" {
-				currentPoints += 3
-			} else if currentBuffer[i] == "<" {
-				currentPoints += 4
-			}
+			currentPoints *= 5
+			currentPoints += COMPLETION_SCORES[currentBuffer[i]]
 		}
 		points = append(points, currentPoints)
 	}
@@ -146,12 +149,6 @@ func part2(lines []string, charmap map[string]string) {
 func main() {
 	input := parseInput("input.txt")
 
-	charmap := make(map[string]string)
-	charmap["("] = ")"
-	charmap["["] = "]"
-	charmap["{"] = "}"
-	charmap["<"] = ">"
-
-	incompleteLines := part1(input, charmap)
-	part2(incompleteLines, charmap)
+	incompleteLines := part1(input)
+	part2(incompleteLines)
 }
