@@ -1,5 +1,11 @@
 package main
 
+// Part 1
+// 452
+
+// Part 2
+// 1263735
+
 import (
 	"fmt"
 	"os"
@@ -46,81 +52,40 @@ func parseInput(filename string) [][]cavePoint {
 
 func getLowestCavePoints(floor [][]cavePoint) []cavePoint {
 	var lowestCavePoints []cavePoint
+	maxHeight := len(floor)
+	maxWidth := len(floor[0])
 
 	for i := range floor {
 		for j := range floor[i] {
-			if i == 0 && j == 0 {
-				if floor[i][j].height < floor[i+1][j].height &&
-					floor[i][j].height < floor[i][j+1].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
+			// UP
+			lowestPoint := true
+			if i-1 >= 0 {
+				if floor[i][j].height >= floor[i-1][j].height {
+					lowestPoint = false
 				}
-			} else if i == len(floor)-1 && j == len(floor[0])-1 {
-				if floor[i][j].height < floor[i-1][j].height &&
-					floor[i][j].height < floor[i][j-1].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
+			}
+			// DOWN
+			if i+1 < maxHeight {
+				if floor[i][j].height >= floor[i+1][j].height {
+					lowestPoint = false
 				}
-			} else if i == 0 && j == len(floor[0])-1 {
-				if floor[i][j].height < floor[i+1][j].height &&
-					floor[i][j].height < floor[i][j-1].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
+			}
+			// LEFT
+			if j-1 >= 0 {
+				if floor[i][j].height >= floor[i][j-1].height {
+					lowestPoint = false
 				}
-			} else if j == 0 && i == len(floor[0])-1 {
-				if floor[i][j].height < floor[i][j+1].height &&
-					floor[i][j].height < floor[i-1][j].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
+			}
+			// RIGHT
+			if j+1 < maxWidth {
+				if floor[i][j].height >= floor[i][j+1].height {
+					lowestPoint = false
 				}
-			} else if i == len(floor)-1 && j == 0 {
-				if floor[i][j].height < floor[i][j+1].height &&
-					floor[i][j].height < floor[i-1][j].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
-				}
-			} else if j == len(floor[0])-1 && i == 0 {
-				if floor[i][j].height < floor[i+1][j].height &&
-					floor[i][j].height < floor[i][j-1].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
-				}
-			} else if i == 0 {
-				if floor[i][j].height < floor[i+1][j].height &&
-					floor[i][j].height < floor[i][j+1].height &&
-					floor[i][j].height < floor[i][j-1].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
-				}
-			} else if j == 0 {
-				if floor[i][j].height < floor[i+1][j].height &&
-					floor[i][j].height < floor[i][j+1].height &&
-					floor[i][j].height < floor[i-1][j].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
-				}
-			} else if i == len(floor)-1 {
-				if floor[i][j].height < floor[i][j+1].height &&
-					floor[i][j].height < floor[i-1][j].height &&
-					floor[i][j].height < floor[i][j-1].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
-				}
-			} else if j == len(floor[0])-1 {
-				if floor[i][j].height < floor[i+1][j].height &&
-					floor[i][j].height < floor[i-1][j].height &&
-					floor[i][j].height < floor[i][j-1].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
-				}
-			} else {
-				if floor[i][j].height < floor[i+1][j].height &&
-					floor[i][j].height < floor[i][j+1].height &&
-					floor[i][j].height < floor[i-1][j].height &&
-					floor[i][j].height < floor[i][j-1].height {
-					floor[i][j].inBasin = true
-					lowestCavePoints = append(lowestCavePoints, floor[i][j])
-				}
+			}
+
+			if lowestPoint {
+				floor[i][j].inBasin = true
+				lowestCavePoints = append(lowestCavePoints, floor[i][j])
 			}
 		}
 	}
@@ -131,129 +96,35 @@ func getLowestCavePoints(floor [][]cavePoint) []cavePoint {
 func getAdjacentBasinPoints(floor [][]cavePoint, cavePoint cavePoint) ([][]cavePoint, bool) {
 	i := cavePoint.y
 	j := cavePoint.x
+	maxHeight := len(floor)
+	maxWidth := len(floor[0])
 	newPoint := false
 
-	if i == 0 && j == 0 {
-		if floor[i+1][j].height != 9 && !floor[i+1][j].inBasin {
-			floor[i+1][j].inBasin = true
-			newPoint = true
-		}
-		if floor[i][j+1].height != 9 && !floor[i][j+1].inBasin {
-			floor[i][j+1].inBasin = true
-			newPoint = true
-		}
-	} else if i == len(floor)-1 && j == len(floor[0])-1 {
+	// UP
+	if i-1 >= 0 {
 		if floor[i-1][j].height != 9 && !floor[i-1][j].inBasin {
 			floor[i-1][j].inBasin = true
 			newPoint = true
 		}
-		if floor[i][j-1].height != 9 && !floor[i][j-1].inBasin {
-			floor[i][j-1].inBasin = true
-			newPoint = true
-		}
-	} else if i == 0 && j == len(floor[0])-1 {
+	}
+	// DOWN
+	if i+1 < maxHeight {
 		if floor[i+1][j].height != 9 && !floor[i+1][j].inBasin {
 			floor[i+1][j].inBasin = true
 			newPoint = true
 		}
+	}
+	// LEFT
+	if j-1 >= 0 {
 		if floor[i][j-1].height != 9 && !floor[i][j-1].inBasin {
 			floor[i][j-1].inBasin = true
 			newPoint = true
 		}
-	} else if j == 0 && i == len(floor[0])-1 {
+	}
+	// RIGHT
+	if j+1 < maxWidth {
 		if floor[i][j+1].height != 9 && !floor[i][j+1].inBasin {
 			floor[i][j+1].inBasin = true
-			newPoint = true
-		}
-		if floor[i-1][j].height != 9 && !floor[i-1][j].inBasin {
-			floor[i-1][j].inBasin = true
-			newPoint = true
-		}
-	} else if i == len(floor)-1 && j == 0 {
-		if floor[i][j+1].height != 9 && !floor[i][j+1].inBasin {
-			floor[i][j+1].inBasin = true
-			newPoint = true
-		}
-		if floor[i-1][j].height != 9 && !floor[i-1][j].inBasin {
-			floor[i-1][j].inBasin = true
-			newPoint = true
-		}
-	} else if j == len(floor[0])-1 && i == 0 {
-		if floor[i+1][j].height != 9 && !floor[i+1][j].inBasin {
-			floor[i+1][j].inBasin = true
-			newPoint = true
-		}
-		if floor[i][j-1].height != 9 && !floor[i][j-1].inBasin {
-			floor[i][j-1].inBasin = true
-			newPoint = true
-		}
-	} else if i == 0 {
-		if floor[i+1][j].height != 9 && !floor[i+1][j].inBasin {
-			floor[i+1][j].inBasin = true
-			newPoint = true
-		}
-		if floor[i][j+1].height != 9 && !floor[i][j+1].inBasin {
-			floor[i][j+1].inBasin = true
-			newPoint = true
-		}
-		if floor[i][j-1].height != 9 && !floor[i][j-1].inBasin {
-			floor[i][j-1].inBasin = true
-			newPoint = true
-		}
-	} else if j == 0 {
-		if floor[i+1][j].height != 9 && !floor[i+1][j].inBasin {
-			floor[i+1][j].inBasin = true
-			newPoint = true
-		}
-		if floor[i][j+1].height != 9 && !floor[i][j+1].inBasin {
-			floor[i][j+1].inBasin = true
-			newPoint = true
-		}
-		if floor[i-1][j].height != 9 && !floor[i-1][j].inBasin {
-			floor[i-1][j].inBasin = true
-			newPoint = true
-		}
-	} else if i == len(floor)-1 {
-		if floor[i][j+1].height != 9 && !floor[i][j+1].inBasin {
-			floor[i][j+1].inBasin = true
-			newPoint = true
-		}
-		if floor[i-1][j].height != 9 && !floor[i-1][j].inBasin {
-			floor[i-1][j].inBasin = true
-			newPoint = true
-		}
-		if floor[i][j-1].height != 9 && !floor[i][j-1].inBasin {
-			floor[i][j-1].inBasin = true
-			newPoint = true
-		}
-	} else if j == len(floor[0])-1 {
-		if floor[i+1][j].height != 9 && !floor[i+1][j].inBasin {
-			floor[i+1][j].inBasin = true
-			newPoint = true
-		}
-		if floor[i-1][j].height != 9 && !floor[i-1][j].inBasin {
-			floor[i-1][j].inBasin = true
-			newPoint = true
-		}
-		if floor[i][j-1].height != 9 && !floor[i][j-1].inBasin {
-			floor[i][j-1].inBasin = true
-			newPoint = true
-		}
-	} else {
-		if floor[i+1][j].height != 9 && !floor[i+1][j].inBasin {
-			floor[i+1][j].inBasin = true
-			newPoint = true
-		}
-		if floor[i][j+1].height != 9 && !floor[i][j+1].inBasin {
-			floor[i][j+1].inBasin = true
-			newPoint = true
-		}
-		if floor[i-1][j].height != 9 && !floor[i-1][j].inBasin {
-			floor[i-1][j].inBasin = true
-			newPoint = true
-		}
-		if floor[i][j-1].height != 9 && !floor[i][j-1].inBasin {
-			floor[i][j-1].inBasin = true
 			newPoint = true
 		}
 	}
@@ -265,101 +136,31 @@ func findAdjacentBasinPoints(floor [][]cavePoint, point cavePoint) []cavePoint {
 	var points []cavePoint
 	i := point.y
 	j := point.x
+	maxHeight := len(floor)
+	maxWidth := len(floor[0])
 
-	if i == 0 && j == 0 {
-		if floor[i+1][j].inBasin {
-			points = append(points, floor[i+1][j])
-		}
-		if floor[i][j+1].inBasin {
-			points = append(points, floor[i][j+1])
-		}
-	} else if i == len(floor)-1 && j == len(floor[0])-1 {
+	// UP
+	if i-1 >= 0 {
 		if floor[i-1][j].inBasin {
 			points = append(points, floor[i-1][j])
 		}
-		if floor[i][j-1].inBasin {
-			points = append(points, floor[i][j-1])
-		}
-	} else if i == 0 && j == len(floor[0])-1 {
+	}
+	// DOWN
+	if i+1 < maxHeight {
 		if floor[i+1][j].inBasin {
 			points = append(points, floor[i+1][j])
 		}
+	}
+	// LEFT
+	if j-1 >= 0 {
 		if floor[i][j-1].inBasin {
 			points = append(points, floor[i][j-1])
 		}
-	} else if j == 0 && i == len(floor[0])-1 {
+	}
+	// RIGHT
+	if j+1 < maxWidth {
 		if floor[i][j+1].inBasin {
 			points = append(points, floor[i][j+1])
-		}
-		if floor[i-1][j].inBasin {
-			points = append(points, floor[i-1][j])
-		}
-	} else if i == len(floor)-1 && j == 0 {
-		if floor[i][j+1].inBasin {
-			points = append(points, floor[i][j+1])
-		}
-		if floor[i-1][j].inBasin {
-			points = append(points, floor[i-1][j])
-		}
-	} else if j == len(floor[0])-1 && i == 0 {
-		if floor[i+1][j].inBasin {
-			points = append(points, floor[i+1][j])
-		}
-		if floor[i][j-1].inBasin {
-			points = append(points, floor[i][j-1])
-		}
-	} else if i == 0 {
-		if floor[i+1][j].inBasin {
-			points = append(points, floor[i+1][j])
-		}
-		if floor[i][j+1].inBasin {
-			points = append(points, floor[i][j+1])
-		}
-		if floor[i][j-1].inBasin {
-			points = append(points, floor[i][j-1])
-		}
-	} else if j == 0 {
-		if floor[i+1][j].inBasin {
-			points = append(points, floor[i+1][j])
-		}
-		if floor[i][j+1].inBasin {
-			points = append(points, floor[i][j+1])
-		}
-		if floor[i-1][j].inBasin {
-			points = append(points, floor[i-1][j])
-		}
-	} else if i == len(floor)-1 {
-		if floor[i][j+1].inBasin {
-			points = append(points, floor[i][j+1])
-		}
-		if floor[i-1][j].inBasin {
-			points = append(points, floor[i-1][j])
-		}
-		if floor[i][j-1].inBasin {
-			points = append(points, floor[i][j-1])
-		}
-	} else if j == len(floor[0])-1 {
-		if floor[i+1][j].inBasin {
-			points = append(points, floor[i+1][j])
-		}
-		if floor[i-1][j].inBasin {
-			points = append(points, floor[i-1][j])
-		}
-		if floor[i][j-1].inBasin {
-			points = append(points, floor[i][j-1])
-		}
-	} else {
-		if floor[i+1][j].inBasin {
-			points = append(points, floor[i+1][j])
-		}
-		if floor[i][j+1].inBasin {
-			points = append(points, floor[i][j+1])
-		}
-		if floor[i-1][j].inBasin {
-			points = append(points, floor[i-1][j])
-		}
-		if floor[i][j-1].inBasin {
-			points = append(points, floor[i][j-1])
 		}
 	}
 
