@@ -169,7 +169,7 @@ func part1(octopuses [][]octopus) {
 }
 
 func part2(octopuses [][]octopus) {
-	fmt.Println("Part 1")
+	fmt.Println("Part 2")
 
 	totalFlashes := 0
 	step := 0
