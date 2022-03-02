@@ -33,7 +33,6 @@ func parseInput(filename string) [][]string {
 	return paths
 }
 
-// func makePaths(input [][]string) []cave {
 func makeCaves(input [][]string) map[string][]string {
 
 	pathMap := make(map[string][]string)
@@ -57,6 +56,22 @@ func part1(input [][]string) {
 	pathMap := makeCaves(input)
 	fmt.Println(pathMap)
 
+	var results []string
+
+	endReached := false
+	for !endReached {
+
+		for _, i := range pathMap["start"] {
+			fmt.Println(i)
+			for _, j := range i {
+				fmt.Println(pathMap[string(j)])
+			}
+		}
+
+		endReached = true
+	}
+
+	fmt.Println(results)
 	fmt.Println()
 }
 
