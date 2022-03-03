@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"unicode"
 )
 
 func checkError(err error) {
@@ -13,8 +14,10 @@ func checkError(err error) {
 }
 
 type cave struct {
-	name        string
-	connections []cave
+	name         string
+	timesVisited int
+	isBig        bool
+	connections  []string
 }
 
 func parseInput(filename string) [][]string {
@@ -33,18 +36,39 @@ func parseInput(filename string) [][]string {
 	return paths
 }
 
-func makeCaves(input [][]string) map[string][]string {
-
-	pathMap := make(map[string][]string)
+func makeCaves(input [][]string) map[string]cave {
+	pathMap := make(map[string]cave)
 	for _, path := range input {
 		if _, ok := pathMap[path[0]]; !ok {
-			pathMap[path[0]] = nil
+			pathMap[path[0]] = cave{name: path[0]}
 		}
 	}
 
+	// Adding all connections to each node
 	for _, path := range input {
-		pathMap[path[0]] = append(pathMap[path[0]], path[1])
-		pathMap[path[1]] = append(pathMap[path[1]], path[0])
+		firstCoord := pathMap[path[0]]
+		firstCoordConnections := firstCoord.connections
+		firstCoordConnections = append(firstCoordConnections, path[1])
+		firstCoord.connections = firstCoordConnections
+		pathMap[path[0]] = firstCoord
+
+		secondCoord := pathMap[path[1]]
+		secondCoordConnections := secondCoord.connections
+		secondCoordConnections = append(secondCoordConnections, path[0])
+		secondCoord.connections = secondCoordConnections
+		pathMap[path[1]] = secondCoord
+	}
+
+	// Don't need to look at 'end' since the path ends there
+	delete(pathMap, "end")
+
+	// Figuring out which caves are big
+	for key := range pathMap {
+		if unicode.IsUpper(rune(key[0])) {
+			tempValue := pathMap[key]
+			tempValue.isBig = true
+			pathMap[key] = tempValue
+		}
 	}
 
 	return pathMap
@@ -53,25 +77,25 @@ func makeCaves(input [][]string) map[string][]string {
 func part1(input [][]string) {
 	fmt.Println("Part 1")
 
-	pathMap := makeCaves(input)
-	fmt.Println(pathMap)
+	var paths []string
 
-	var results []string
+	caves := makeCaves(input)
+	fmt.Println(caves)
 
-	endReached := false
-	for !endReached {
+	hasChoices := true
+	currentCave := caves["start"]
+	currentPath := ""
+	for hasChoices {
+		currentPath += currentCave.name + ","
+		currentChoices := currentCave.connections
+		fmt.Println(currentChoices)
 
-		for _, i := range pathMap["start"] {
-			fmt.Println(i)
-			for _, j := range i {
-				fmt.Println(pathMap[string(j)])
-			}
-		}
-
-		endReached = true
+		paths = append(paths, currentPath)
+		hasChoices = false
 	}
 
-	fmt.Println(results)
+	fmt.Println(paths)
+
 	fmt.Println()
 }
 
